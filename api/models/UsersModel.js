@@ -4,11 +4,13 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
     },
-    userPassword: {
+    password: {
       type: String,
       required: true,
+    },
+    players: {
+      type: String,
     },
     isFinished: {
       type: Boolean,
@@ -24,6 +26,9 @@ const UserSchema = new mongoose.Schema(
     },
     answers: {
       type: Object,
+    },
+    role: {
+      type: String,
     },
     teamName: {
       type: String,
