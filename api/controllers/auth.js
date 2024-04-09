@@ -63,18 +63,18 @@ exports.loginController = async (req, res, next) => {
   const teamName = user.teamName;
   const isFinished = user.isFinished;
 
-  const {}
+  // const {}
 
   return res.json({
-                message: "Sign in successfully",
-                token,
-                currentUser,
-                currentId,
-                userAnswer,
-                teamName,
-                isFinished,
-                role: user.role,
-            });
+    message: "Sign in successfully",
+    token,
+    currentUser,
+    currentId,
+    userAnswer,
+    teamName,
+    isFinished,
+    role: user.role,
+  });
 };
 
 exports.finishedExam = (req, res) => {

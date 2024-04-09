@@ -1,11 +1,10 @@
 const Status = require("../models/StatusModel.js");
-const user = require("../models/usersModel.js");
+const User = require("../models/usersModel.js");
 
 module.exports = {
   ensureOnceLogin: async function (req, res, next) {
-    const user = await user
-      .findOne({ username: req.body.username })
-      .exec((err, result) => {
+    const user = await User.findOne({ username: req.body.username }).exec(
+      (err, result) => {
         if (result.isFinished == true) {
           return res.status(403).json({
             error: "No more attempt is allowed!",
@@ -14,7 +13,8 @@ module.exports = {
         } else {
           next();
         }
-      });
+      }
+    );
     user();
   },
 
@@ -22,7 +22,7 @@ module.exports = {
     const status = Status.findOne();
     const role = req.body.role;
     const username = req.body.username;
-    if (!status.isOpen && !username?.includes("mbaksk")) {
+    if (!status.isOpen && !username?.includes("mbaksk" || "b4ngIC")) {
       return res.status(400).json({
         error: "Sorry, but the exam is closed!",
       });
