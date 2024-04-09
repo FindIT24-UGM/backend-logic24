@@ -88,6 +88,37 @@ exports.getQuestion = (req, res) => {
     });
 };
 
+exports.getEssay = (req, res) => {
+  const essayNumber = req.body.essayNumber;
+  EssaySchema.find({ essayNumber: { $in: essayNumber } })
+    .exec()
+    .then((data) => {
+      const essayData = [];
+      essayNumber.forEach((essayNumber) => {
+        const foundQuestion = data.find(
+          (item) => item.essayNumber === essayNumber
+        );
+        if (foundQuestion) {
+          essayData.push({
+            essayNumber: foundQuestion.essayNumber,
+            essay: foundQuestion.essay,
+            imageLink: foundQuestion.imageLink,
+          });
+        }
+      });
+      res.status(200).json({
+        message: "Question found",
+        data: essayData,
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: "Error while find essay",
+        error: error,
+      });
+    });
+};
+
 exports.saveUserAnswer = async (req, res) => {
   try {
     const username = req.body.username;
