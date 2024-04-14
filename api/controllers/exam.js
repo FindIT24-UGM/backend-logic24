@@ -28,8 +28,8 @@ exports.startExamControllers = async (req, res) => {
           { username: examUser },
           {
             $set: {
-              questionNumber: user.questionNumber,
-              essayNumber: user.essayNumber,
+              questionNumber: questionNumber,
+              essayNumber: essayNumber,
             },
           },
           { upsert: true }
