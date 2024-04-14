@@ -58,7 +58,7 @@ exports.startExamControllers = async (req, res) => {
     });
 };
 
-exports.getQuestion = (req, res) => {
+exports.getQuestions = (req, res) => {
   const examNumber = req.body.questionNumber;
   QuestionSchema.find({ number: { $in: examNumber } })
     .exec()
@@ -76,13 +76,13 @@ exports.getQuestion = (req, res) => {
         }
       });
       res.status(200).json({
-        message: "Question has been found!",
+        message: "Questions has been found!",
         data: sortedData,
       });
     })
     .catch((err) => {
       res.status(500).json({
-        message: "Error while fetching question!",
+        message: "Error while fetching questions!",
         err: err,
       });
     });
@@ -93,13 +93,11 @@ exports.getEssay = (req, res) => {
   EssaySchema.find({ essayNumber: { $in: essayNumber } })
     .exec()
     .then((data) => {
-      const essayData = [];
-      essayNumber.forEach((essayNumber) => {
-        const foundQuestion = data.find(
-          (item) => item.essayNumber === essayNumber
-        );
+      const sortedData = [];
+      essayNumber.forEach((number) => {
+        const foundQuestion = data.find((item) => item.essayNumber === number);
         if (foundQuestion) {
-          essayData.push({
+          sortedData.push({
             essayNumber: foundQuestion.essayNumber,
             essay: foundQuestion.essay,
             imageLink: foundQuestion.imageLink,
@@ -107,13 +105,13 @@ exports.getEssay = (req, res) => {
         }
       });
       res.status(200).json({
-        message: "Question found",
-        data: essayData,
+        message: "Essays found",
+        data: sortedData,
       });
     })
     .catch((error) => {
       res.status(500).json({
-        message: "Error while find essay",
+        message: "Error while find essays",
         error: error,
       });
     });
