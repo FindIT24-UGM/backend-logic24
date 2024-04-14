@@ -133,7 +133,7 @@ exports.saveUserAnswer = async (req, res) => {
       });
     }
 
-    res.status(400).json({
+    res.status(200).json({
       message: "Answer saved!",
       data: updatedUser,
     });
@@ -164,4 +164,32 @@ exports.getUserAnswer = async (req, res) => {
     });
 };
 
-exports.getExamEndTime = async (req, res) => {};
+exports.getExamEndTime = async (req, res) => {
+  try {
+    const username = req.body.username;
+
+    // kita perlu attribute userStartExamTime, aku sembarang dulu ya
+    const user = await User.findOne({ username: username });
+
+    // sembarang userStartExamTime
+    const startTime = new Date();
+
+    // berapa lama batas waktu pengerjaan, contohnya 1 jam 30 menit
+    const hourDuration = 1;
+    const minuteDuration = 30;
+
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + hourDuration);
+    endTime.setMinutes(startTime.getMinutes() + minuteDuration);
+
+    res.status(200).json({
+      message: "Exam end time retrieved",
+      data: endTime,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error while fetching exam end time",
+      error: err,
+    });
+  }
+};
