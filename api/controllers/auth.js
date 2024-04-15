@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-// const User = require("../models/usersModel.js");
+const User = require("../models/UsersModel.js");
 const jwt = require("jsonwebtoken");
 const { expressjwt } = require("express-jwt");
 
@@ -74,6 +74,74 @@ exports.loginController = async (req, res, next) => {
     teamName,
     isFinished,
     role: user.role,
+  });
+};
+
+exports.authenticateSocket = async (req, res) => {
+  const socketId = req.body.socketId;
+  const userId = req.body.userId;
+  const playerNumber = req.body.playerNumber;
+
+  if (!socketId || !userId || !playerNumber) {
+    return res.status(400).json({
+      error: "socketId, userId and playerNumber is required",
+    });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(400).json({
+      error: "User not found",
+    });
+  }
+
+  const player = user.players[playerNumber - 1];
+
+  if (!player) {
+    return res.status(400).json({
+      error: "Player not found",
+    });
+  }
+
+  if (player.socketId != null) {
+    return res.status(400).json({
+      error: "Player already connected",
+    });
+  }
+
+  // Assign timer if endTime of user doesn't exist
+  console.log(user.endTime)
+  if(!user.endTime) {
+    const endTime = new Date();
+    endTime.setHours(endTime.getHours() + 2);
+    const updateQuery = {
+      $set: {
+        endTime: endTime
+      }
+    }
+    const updateResult = await User.updateOne({ _id: user._id }, updateQuery);
+    if (updateResult.nModified === 0) {
+      return res.status(500).json({
+        error: "Failed to update endTime",
+      });
+    }
+  }
+
+  // Update the player's socketId in the players array
+  const updateQuery = {
+    $set: { [`players.${playerNumber - 1}.socketId`]: socketId },
+  };
+  const updateResult = await User.updateOne({ _id: user._id }, updateQuery);
+
+  if (updateResult.nModified === 0) {
+    return res.status(500).json({
+      error: "Failed to update player",
+    });
+  }
+
+  return res.json({
+    message: `${user.players[playerNumber - 1].name} connected to socket`,
   });
 };
 

@@ -1,5 +1,5 @@
 const Status = require("../models/StatusModel.js");
-const User = require("../models/usersModel.js");
+const User = require("../models/UsersModel.js");
 
 module.exports = {
   ensureOnceLogin: async function (req, res, next) {
