@@ -1,10 +1,10 @@
 const { validationResult } = require("express-validator");
-const User = require("../models/usersModel.js");
+// const User = require("../models/usersModel.js");
 const jwt = require("jsonwebtoken");
-const expressJwt = require("express-jwt");
+const { expressjwt } = require("express-jwt");
 
-exports.signInRequired = expressJwt({
-  secret: process.env.JWT_SECRET,
+exports.signInRequired = expressjwt({
+  secret: "j4w1r15451n1br0",
   algorithms: ["HS256"],
   getToken: function fromHeaderOrCookie(req) {
     if (

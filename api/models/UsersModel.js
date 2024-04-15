@@ -9,9 +9,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    players: {
-      type: String,
-    },
     isFinished: {
       type: Boolean,
     },
@@ -29,6 +26,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
+      default: "participantIC",
     },
     teamName: {
       type: String,
@@ -41,7 +39,7 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.methods = {
   authenticate: function (password) {
-    return password === this.userPassword;
+    return password === this.password;
   },
 };
 
