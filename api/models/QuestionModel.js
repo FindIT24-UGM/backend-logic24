@@ -13,6 +13,9 @@ const QuestionSchema = new mongoose.Schema({
   imageLink: {
     type: String,
   },
+  report: {
+    type: [String],
+  },
 });
 
 module.exports = mongoose.model("Question", QuestionSchema);

@@ -8,6 +8,7 @@ const {
   saveUserAnswer,
   getEssay,
   getUserAnswer,
+  reportQuestion,
 } = require("../controllers/exam");
 // const {
 //   ensureOpen,
@@ -34,6 +35,11 @@ router.get("/question", /* ensureOpen ,*/ /*signInRequired*/ getQuestions);
 // BODY: essayNumber
 // RETURN: essay
 router.get("/essay", /* ensureOpen ,*/ /* signInRequired, */ getEssay);
+
+// PATCH API for user to report question
+// BODY : questionNumber, report
+// RETURN : message
+router.patch("/question", /** ensureOpen ,signInRequired**/ reportQuestion);
 
 // POST API for user to save answer
 // BODY: username, answerBody

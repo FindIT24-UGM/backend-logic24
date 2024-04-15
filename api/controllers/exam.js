@@ -2,6 +2,7 @@ const User = require("../models/UsersModel");
 const QuestionSchema = require("../models/QuestionModel");
 const EssaySchema = require("../models/EssayModel");
 const { generateKeys } = require("../helpers/generateKeys");
+const QuestionModel = require("../models/QuestionModel");
 
 exports.startExamControllers = async (req, res) => {
   const examUser = req.body.username;
@@ -186,6 +187,29 @@ exports.getExamEndTime = async (req, res) => {
       message: "Exam end time retrieved",
       data: endTime,
     });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error while fetching exam end time",
+      error: err,
+    });
+  }
+};
+
+exports.reportQuestion = async (req, res) => {
+  try {
+    const questionNumber = req.body.questionNumber;
+    const reportMessage = req.body.reportMessage;
+    const question = await QuestionModel.findOne({ number: questionNumber });
+    if (!question) {
+      return res.status(400).json({
+        message: `Question number ${questionNumber} is not found!`,
+      });
+    }
+    question.report = [reportMessage, ...question.report];
+    await question.save();
+    return res
+      .status(200)
+      .json({ message: `Question ${questionNumber} has been reported!` });
   } catch (err) {
     res.status(500).json({
       message: "Error while fetching exam end time",
