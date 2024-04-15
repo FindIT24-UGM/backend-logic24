@@ -11,6 +11,9 @@ const authRouter = require("./api/routes/authRouter");
 const examRouter = require("./api/routes/examRouter");
 // const adminRouter = require("./api/routes/adminRouter");
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 app.get("/", (req, res) => {
   res.send("API Logic Find IT! 2024");
 });
@@ -19,7 +22,6 @@ app.use("/auth", authRouter);
 app.use("/exam", examRouter);
 // app.use("/admin", adminRouter);
 
-app.use(bodyParser.json());
 app.use(morgan("dev"));
 
 app.use(cors());

@@ -59,12 +59,12 @@ exports.startExamControllers = async (req, res) => {
 };
 
 exports.getQuestions = (req, res) => {
-  const examNumber = req.body.questionNumber;
-  QuestionSchema.find({ number: { $in: examNumber } })
+  const questionNumber = req.body.questionNumber;
+  QuestionSchema.find({ number: { $in: questionNumber } })
     .exec()
     .then((data) => {
       const sortedData = [];
-      examNumber.forEach((number) => {
+      questionNumber.forEach((number) => {
         const foundQuestion = data.find((item) => item.number === number);
         if (foundQuestion) {
           sortedData.push({

@@ -28,7 +28,7 @@ router.patch(
 // POST API for user to get question
 // BODY: questionNumber
 // RETURN: question
-router.get("/question", /* ensureOpen ,*/ signInRequired, getQuestions);
+router.get("/question", /* ensureOpen ,*/ /*signInRequired*/ getQuestions);
 
 // POST API for user to get essay
 // BODY: essayNumber
