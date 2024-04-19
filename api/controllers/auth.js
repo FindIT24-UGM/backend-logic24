@@ -19,9 +19,8 @@ exports.signInRequired = expressjwt({
   },
 });
 
-exports.loginController = async (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.userPassword;
+exports.loginController = async (req, res) => {
+  const { username, password } = req.body;
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -29,52 +28,48 @@ exports.loginController = async (req, res, next) => {
     return res.status(400).json({
       error: firstError,
     });
+  }else {
+    User.findOne({ username })
+      .exec()
+      .then((user) => {
+        if (!user) {
+          return res.status(400).json({
+            errors: "User with that username does not exist",
+          });
+        }
+
+        // authenticate (custom method)
+        if (!user.authenticate(password)) {
+          return res.status(400).json({
+            errors: "username and password do not match",
+          });
+        }
+
+        // generate a token and send to client
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: "12h",
+        });
+
+        res.cookie("cookiesLogic", token, { expiresIn: "3h" });
+  
+        return res.json({
+          message: "Sign in successfully",
+          token,
+          userData: {
+            currentUser: user.username,
+            currentId: user._id,
+            answers: user.userAnswer,
+			teamName: user.teamName,
+			isFinished: user.isFinished
+          },
+        });
+      })
+      .catch((err) => {
+        return res.status(500).json({
+          errors: "Internal server error",
+        });
+      });
   }
-
-  const user = await User.findOne({ username: username });
-
-  if (!userName || !password) {
-    return res.status(400).json({
-      error: "username and password is required!",
-    });
-  }
-
-  if (!user) {
-    return res.status(400).json({
-      error: "user is not found!",
-    });
-  }
-
-  if (!user.authenticate(password)) {
-    return res.status(400).json({
-      error: "Email and Password does not match!",
-    });
-  }
-
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "12h",
-  });
-
-  res.cookie("cookiesLogic", token, { expiresIn: "3h" });
-
-  const currentUser = user.username;
-  const currentId = user._id;
-  const answers = user.userAnswer;
-  const teamName = user.teamName;
-  const isFinished = user.isFinished;
-
-  // const {}
-
-  return res.json({
-    message: "Sign in successfully",
-    token,
-    currentUser,
-    currentId,
-    userAnswer,
-    teamName,
-    isFinished,
-    role: user.role,
-  });
 };
 
 exports.authenticateSocket = async (req, res) => {

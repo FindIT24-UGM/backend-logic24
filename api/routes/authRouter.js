@@ -2,7 +2,7 @@ const express = require("express");
 const {
   signInRequired,
   loginController,
-  finishedExam,
+  finishedExam
 } = require("../controllers/auth");
 const router = express.Router();
 
