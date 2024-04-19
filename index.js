@@ -3,42 +3,21 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;  //KU GANTI 5001 BIAR GAK NABRAK BE MAIN WEB PAS NYOBA2
 const connectMongo = require("./api/config/mongo");
 const app = express();
 
+const adminRouter = require("./api/routes/adminRouter");
 const authRouter = require("./api/routes/authRouter");
 const examRouter = require("./api/routes/examRouter");
-// const adminRouter = require("./api/routes/adminRouter");
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  res.send("API Logic Find IT! 2024");
-});
-
-app.use("/auth", authRouter);
-app.use("/exam", examRouter);
-// app.use("/admin", adminRouter);
-
 app.use(morgan("dev"));
 
-app.use(cors());
-
-// Config
-dotenv.config({ path: "./api/config/config.env" });
-
-// Connect to MongoDB
-connectMongo();
-
-//SERVER RUN
-app.listen(port, () => {
-  console.log(
-    `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
-  );
-});
-
+// app.use(cors());
 // CORS
 app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
@@ -53,3 +32,26 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.get("/", (req, res) => {
+  res.send("API Logic Find IT! 2024");
+});
+
+app.use("/admin", adminRouter);
+app.use("/auth", authRouter);
+app.use("/exam", examRouter);
+
+// Config
+dotenv.config({ path: "./api/config/config.env" });
+
+// Connect to MongoDB
+connectMongo();
+
+//SERVER RUN
+app.listen(port, () => {
+  console.log(
+    `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
+  );
+});
+
+

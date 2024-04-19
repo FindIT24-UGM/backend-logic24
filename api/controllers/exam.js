@@ -31,6 +31,7 @@ exports.startExamControllers = async (req, res) => {
             $set: {
               questionNumber: questionNumber,
               essayNumber: essayNumber,
+              startedTime: Date.now()
             },
           },
           { upsert: true }

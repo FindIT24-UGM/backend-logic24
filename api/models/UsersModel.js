@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema(
     teamName: {
       type: String,
     },
+    startedTime: String,
+    status: {
+      type: String,
+      default: "NO"  //klo blm ngerjain : 'NO', sedang ngerjain: 'DOING', selesai: 'DONE' + set isFinished: true
+    }
   },
   {
     timestamps: true,
