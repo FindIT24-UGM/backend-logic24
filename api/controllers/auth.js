@@ -59,8 +59,8 @@ exports.loginController = async (req, res) => {
             currentUser: user.username,
             currentId: user._id,
             answers: user.userAnswer,
-			teamName: user.teamName,
-			isFinished: user.isFinished
+            teamName: user.teamName,
+            isFinished: user.isFinished
           },
         });
       })
@@ -124,7 +124,7 @@ exports.authenticateSocket = async (req, res) => {
   }
 
   // Update the player's socketId in the players array
-  const updateQuery = {
+const updateQuery = {
     $set: { [`players.${playerNumber - 1}.socketId`]: socketId },
   };
   const updateResult = await User.updateOne({ _id: user._id }, updateQuery);

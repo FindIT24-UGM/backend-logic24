@@ -6,6 +6,13 @@ const cors = require("cors");
 const port = process.env.PORT || 5001;  //KU GANTI 5001 BIAR GAK NABRAK BE MAIN WEB PAS NYOBA2
 const connectMongo = require("./api/config/mongo");
 const app = express();
+const server = require("http").createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
 const adminRouter = require("./api/routes/adminRouter");
 const authRouter = require("./api/routes/authRouter");
@@ -54,4 +61,75 @@ app.listen(port, () => {
   );
 });
 
+const User = require("./api/models/UsersModel");
+const authenticatedTeams = [];
+const admins = [];
+io.on("connection", (socket) => {
+  console.log("a user connected, with socketId: " + socket.id);
+  let teamName_g = null;
+  let playerIndex_g = null;
+  // ? Team Authentication
+  socket.on("player-auth", async (authData) => {
+    teamName_g = authData.teamName;
+    playerIndex_g = authData.playerIndex;
+    const teamName = authData.teamName;
+    const playerIndex = authData.playerIndex;
+    const playerName = authData.username;
+    await User.updateOne(
+      { teamName: teamName },
+      { $set: { [`players.${playerIndex}.socketId`]: socket.id } }
+    );
+    const user = await User.findOne({ teamName: teamName });
+    // if (user) {
+      
+    // }
+    if (!user?.endTime) {
+      const endTime = new Date();
+      endTime.setHours(endTime.getHours() + 2);
+      // endTime.setMinutes(endTime.getMinutes() + 30);
+      // endTime.setSeconds(endTime.getSeconds() + 20);
+      await User.updateOne(
+        {
+          teamName: teamName,
+        },
+        {
+          $set: {
+            endTime: endTime,
+          },
+        }
+      );
+    }
+    socket.join(teamName);
+    socket
+      .to(teamName)
+      .emit("teammate-join", `Teammate ${playerName} bergabung`);
+  });
+  socket.on("disconnect", async () => {
+    console.log("user disconnected");
+    await User.updateOne(
+      { teamName: teamName_g },
+      { $set: { [`players.${playerIndex_g}.socketId`]: null } }
+    );
+    socket.broadcast.emit("admin-update");
+  });
+  socket.on("move", async (data) => {
+    const playerName = data.playerName;
+    const code = data.code;
+    // await Teams.updateOne({ teamname: teamName_g }, { $set: { [`players.${playerIndex}.position`]: code } });
+    socket.to(teamName_g).emit("teammate-move", { playerName, code });
+  });
+  socket.on("admin-broadcast", msg => {
+    console.log("admin: " + msg)
+    socket.broadcast.emit("message", msg);
+  });
+  socket.on("update", () => {
+    socket.broadcast.emit("admin-update");
+  })
+  socket.on("team-update", () => {
+    socket.to(teamName_g).emit("answer-update");
+  })
+});
 
+// server.listen(port, () => {
+//   console.log(`Server listening at http://localhost:${port}`);
+// });
