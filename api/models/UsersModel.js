@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     startedTime: String,
+    endTime: String,
     status: {
       type: String,
       default: "NO"  //klo blm ngerjain : 'NO', sedang ngerjain: 'DOING', selesai: 'DONE' + set isFinished: true

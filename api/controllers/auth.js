@@ -143,7 +143,11 @@ const updateQuery = {
 exports.finishedExam = (req, res) => {
   User.findOneAndUpdate(
     { username: req.body.username },
-    { $set: { isFinished: true } }
+    { $set: { 
+      isFinished: true, 
+      status: "DONE", 
+      endTime: Date.now() 
+    } }
   )
     .exec()
     .then(() => {
