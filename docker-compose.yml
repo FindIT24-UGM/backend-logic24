@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  backendlogic24:
+    image: backendlogic24
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5001:5001
