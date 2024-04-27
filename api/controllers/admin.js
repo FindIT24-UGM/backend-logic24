@@ -23,7 +23,7 @@ exports.getTeamsScore = async (req, res) => {
     let questionValue = [];
     let answerValue = [];
 
-    const examUser = await User.findOne({ teamName: teamName });
+    const examUser = await User.findOne({ username: username });
     let questionTeam = [];
     let answerTeam = [];
 
