@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
     // }
     if (!user?.endTime) {
       const endTime = new Date();
-      endTime.setHours(endTime.getHours() + 2);
+      endTime.setHours(endTime.getHours() + 1);
       // endTime.setMinutes(endTime.getMinutes() + 30);
       // endTime.setSeconds(endTime.getSeconds() + 20);
       await User.updateOne(
