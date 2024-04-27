@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
+const { fileURLToPath } = require("url");
+const { dirname, join } = require("path");
 const port = process.env.PORT || 5001; //KU GANTI 5001 BIAR GAK NABRAK BE MAIN WEB PAS NYOBA2
 const connectMongo = require("./api/config/mongo");
 const app = express();
@@ -39,6 +41,11 @@ app.use((req, res, next) => {
   next();
 });
 
+console.log(__dirname);
+app.get("/socket/", (req, res) =>
+  res.sendFile(join(__dirname, "/client/index.html"))
+);
+
 app.get("/", (req, res) => {
   res.send("API Logic Find IT! 2024");
 });
@@ -54,15 +61,16 @@ dotenv.config({ path: "./api/config/config.env" });
 connectMongo();
 
 //SERVER RUN
-app.listen(port, () => {
-  console.log(
-    `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
-  );
-});
+// app.listen(port, () => {
+//   console.log(
+//     `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
+//   );
+// });
 
 const User = require("./api/models/UsersModel");
 const authenticatedTeams = [];
 const admins = [];
+
 io.on("connection", (socket) => {
   console.log("a user connected, with socketId: " + socket.id);
   let teamName_g = null;
