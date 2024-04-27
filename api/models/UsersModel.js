@@ -31,8 +31,28 @@ const UserSchema = new mongoose.Schema(
     teamName: {
       type: String,
     },
-    startedTime: String,
-    endTime: String,
+    playerIndex: {
+      type: String
+    },
+    players: [
+      {
+        socketId: {
+          type: String
+        },
+        playerName: {
+          tyep: String
+        },
+        position: {
+          type: String
+        }
+      }
+    ],
+    startedTime: {
+      type: String
+    },
+    endTime: {
+      type: String
+    },
     status: {
       type: String,
       default: "NO"  //klo blm ngerjain : 'NO', sedang ngerjain: 'DOING', selesai: 'DONE' + set isFinished: true

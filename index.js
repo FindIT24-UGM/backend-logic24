@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
+const { fileURLToPath } = require('url');
+const { dirname, join } = require('path');
 const port = process.env.PORT || 5001;  //KU GANTI 5001 BIAR GAK NABRAK BE MAIN WEB PAS NYOBA2
 const connectMongo = require("./api/config/mongo");
 const app = express();
@@ -40,6 +42,9 @@ app.use((req, res, next) => {
   next();
 });
 
+console.log(__dirname);
+app.get("/socket/", (req, res) => res.sendFile(join(__dirname, "/client/index.html")));
+
 app.get("/", (req, res) => {
   res.send("API Logic Find IT! 2024");
 });
@@ -55,20 +60,21 @@ dotenv.config({ path: "./api/config/config.env" });
 connectMongo();
 
 //SERVER RUN
-app.listen(port, () => {
-  console.log(
-    `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
-  );
-});
+// app.listen(port, () => {
+//   console.log(
+//     `Server backend FIND-IT 2024 IT COMPETITION running on port http://localhost:${port}`
+//   );
+// });
 
 const User = require("./api/models/UsersModel");
 const authenticatedTeams = [];
 const admins = [];
+
+
 io.on("connection", (socket) => {
   console.log("a user connected, with socketId: " + socket.id);
   let teamName_g = null;
   let playerIndex_g = null;
-  // ? Team Authentication
   socket.on("player-auth", async (authData) => {
     teamName_g = authData.teamName;
     playerIndex_g = authData.playerIndex;
@@ -77,12 +83,10 @@ io.on("connection", (socket) => {
     const playerName = authData.username;
     await User.updateOne(
       { teamName: teamName },
-      { $set: { [`players.${playerIndex}.socketId`]: socket.id } }
+      { $set: { [`players.${playerIndex}.socketId`]: socket.id } },
+      { multi: true }
     );
     const user = await User.findOne({ teamName: teamName });
-    // if (user) {
-      
-    // }
     if (!user?.endTime) {
       const endTime = new Date();
       endTime.setHours(endTime.getHours() + 2);
@@ -103,7 +107,7 @@ io.on("connection", (socket) => {
     socket
       .to(teamName)
       .emit("teammate-join", `Teammate ${playerName} bergabung`);
-  });
+  })
   socket.on("disconnect", async () => {
     console.log("user disconnected");
     await User.updateOne(
@@ -112,24 +116,27 @@ io.on("connection", (socket) => {
     );
     socket.broadcast.emit("admin-update");
   });
+
   socket.on("move", async (data) => {
     const playerName = data.playerName;
     const code = data.code;
     // await Teams.updateOne({ teamname: teamName_g }, { $set: { [`players.${playerIndex}.position`]: code } });
     socket.to(teamName_g).emit("teammate-move", { playerName, code });
+    console.log("move");
   });
+
   socket.on("admin-broadcast", msg => {
     console.log("admin: " + msg)
     socket.broadcast.emit("message", msg);
   });
   socket.on("update", () => {
     socket.broadcast.emit("admin-update");
-  })
+  });
   socket.on("team-update", () => {
     socket.to(teamName_g).emit("answer-update");
-  })
-});
+  });
+})
 
-// server.listen(port, () => {
-//   console.log(`Server listening at http://localhost:${port}`);
-// });
+server.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
