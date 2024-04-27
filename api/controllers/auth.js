@@ -21,14 +21,14 @@ exports.signInRequired = expressjwt({
 
 exports.loginController = async (req, res) => {
   const { username, password } = req.body;
-  const errors = validationResult(req);
+  // const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const firstError = errors.array().map((error) => error.msg)[0];
-    return res.status(400).json({
-      error: firstError,
-    });
-  }else {
+  // if (!errors.isEmpty()) {
+  //   const firstError = errors.array().map((error) => error.msg)[0];
+  //   return res.status(400).json({
+  //     error: firstError,
+  //   });
+  // }else {
     User.findOne({ username })
       .exec()
       .then((user) => {
@@ -69,7 +69,7 @@ exports.loginController = async (req, res) => {
           errors: "Internal server error",
         });
       });
-  }
+  // }
 };
 
 exports.authenticateSocket = async (req, res) => {
