@@ -9,6 +9,6 @@ const router = express.Router();
 // Post API For Login
 // Body: username, password
 // RETURN: token, currentUser, currentId, answers, teamName
-router.post("/login", signInRequired, loginController);
+router.post("/login", loginController);
 
 module.exports = router;

@@ -29,12 +29,12 @@ router.patch(
 // POST API for user to get question
 // BODY: questionNumber
 // RETURN: question
-router.get("/question", /* ensureOpen ,*/ /*signInRequired*/ getQuestions);
+router.post("/question", /* ensureOpen ,*/ signInRequired, getQuestions);
 
 // POST API for user to get essay
 // BODY: essayNumber
 // RETURN: essay
-router.get("/essay", /* ensureOpen ,*/ /* signInRequired, */ getEssay);
+router.post("/essay", /* ensureOpen ,*/ /* signInRequired, */ getEssay);
 
 // PATCH API for user to report question
 // BODY : questionNumber, report

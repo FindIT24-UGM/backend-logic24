@@ -18,9 +18,9 @@ const UserSchema = new mongoose.Schema(
     essayNumber: {
       type: Array,
     },
-    userAnswer: {
+    userAnswer: [{
       type: Object,
-    },
+    }],
     answers: {
       type: Object,
     },

@@ -23,9 +23,9 @@ exports.startExamControllers = async (req, res) => {
           essayNumber: essayNumber,
         });
       } else {
-        questionNumber = generateKeys(45);
-        essayNumber = generateKeys(10);
-        User.updateOne(
+        questionNumber = generateKeys(5);
+        essayNumber = generateKeys(5);
+        User.findOneAndUpdate(
           { username: examUser },
           {
             $set: {

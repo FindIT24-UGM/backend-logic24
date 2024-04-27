@@ -1,5 +1,6 @@
 const QuestionModel = require("../models/QuestionModel");
 const User = require("../models/UsersModel");
+const Answer = require("../models/AnswerModel")
 
 exports.ensureAdmin = async (req, res, next) => {
   if (req.body.role !== "mbaksk" || "b4ngIC") {
@@ -12,52 +13,82 @@ exports.ensureAdmin = async (req, res, next) => {
 
 exports.getTeamsScore = async (req, res) => {
   const username = req.body.username;
-  const teamname = req.body.teamname;
+  const teamName = req.body.teamName;
   User.findOneAndUpdate(
     { username: username },
-    { $set: { teamname: teamname } }
+    { $set: { teamName: teamName } }
   );
   try {
-    const targetAnswer = await Answer.findOne({ name: "AnswerPairs" });
-    const questionValue = [];
-    const answerValue = [];
+    const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
+    let questionValue = [];
+    let answerValue = [];
 
-    const examUser = await User.findOne({ teamname: teamname });
-    const questionTeam = [];
-    const answerTeam = [];
+    const examUser = await User.findOne({ teamName: teamName });
+    let questionTeam = [];
+    let answerTeam = [];
 
-    for (const [key, value] of Object.entries(targetAnswer.answeredPairs)) {
-      questionValue.push(key);
-      answerValue.push(value);
-    }
+    targetAnswer.answeredPairs.forEach(answer => {
+      questionValue.push(answer.question);
+      answerValue.push(answer.answer);
+    });
 
-    for (const [key, value] of Object.entries(targetUser.userAnswer)) {
-      questionTeam.push(key);
-      answerTeam.push(value);
-    }
+    examUser.userAnswer.forEach(userAnswer => {
+      questionTeam.push(userAnswer.quest)
+      answerTeam.push(userAnswer.answer)
+    })
+    // for (const [key, value] of Object.entries(targetAnswer.answeredPairs)) {
+    //   questionValue.push(key);
+    //   answerValue.push(value);
+    // }
+
+    // for (const [key, value] of Object.entries(targetUser.userAnswer)) {
+    //   questionTeam.push(key);
+    //   answerTeam.push(value);
+    // }
 
     if (examUser) {
       let score = 0;
+      let benar = 0;
+      let salah = 0;
 
       for (let i = 0; i < questionTeam.length; i++) {
-        const question = questionTeam[i];
-        const answer = answerTeam[i];
-        const questionIndex = questionValue.indexOf(question);
+        let question = questionTeam[i];
+        let answer = answerTeam[i];
+        // let questionIndex = questionValue.indexOf(question);
+        for (let j = 0; j < questionValue.length; j++){
+          let questionKey = questionValue[j];
+          let answerKey = answerValue[j];
 
-        if (questionIndex !== -1) {
-          const answerValueAtIndex = answerValue[questionIndex];
-
-          if ((answer = answerValueAtIndex)) {
+          if(question == questionKey && answer == answerKey){
             score += 4;
-          } else if ((answer = answerValueAtIndex)) {
-            score -= 1;
+            benar += 1;
           }
+          if(question == questionKey && answer != answerKey){
+            score += -1;
+            salah += 1;
+          }
+          
         }
+        // if (questionIndex !== -1) {
+        //   let answerValueAtIndex = answerValue[questionIndex];
+
+        //   if ((answer = answerValueAtIndex)) {
+        //     score += 4;
+        //     benar += 1;
+        //   } else if ((answer = answerValueAtIndex)) {
+        //     score -= 1;
+        //     salah += 1;
+        //   }
+        // }
       }
       res.status(200).json({
         message: "Team answer successfully fetched!",
-        teamname: examUser.teamname,
+        teamName: examUser.teamName,
         score: score,
+        benar,
+        salah
+        // kunci: targetAnswer.answeredPairs,
+        // user: examUser.userAnswer
       });
     } else {
       res.status(404).json({
@@ -131,6 +162,39 @@ exports.getReportedQuestion = (req, res) => {
       error: "cannot get reported question", 
       err
     })
+  })
+}
+
+exports.uploadAnswer = (req, res) => {
+  const { answeredPairs } = req.body
+  const newAnswer = new Answer({
+    name: "AnswerMultiple",
+    answeredPairs
+  })
+  newAnswer
+  .save()
+  .then(result => {
+    res.status(201).json(result)
+  }).catch(err => {
+    res.status(404).json(err)
+  })
+}
+
+exports.registerController = (req, res) => {
+  const { username, password } = req.body
+  const newUser = new User({
+    username,
+    password
+  })
+  newUser.save()
+  .then(result => {
+    res.status(201).json({
+      message: "success create new user",
+      result
+    })
+  })
+  .catch(err => {
+    res.status(404).json(err)
   })
 }
 

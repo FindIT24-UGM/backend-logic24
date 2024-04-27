@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { getTeamsScore, getTeamsAnswer, getReportedQuestion, getParticipants } = require("../controllers/admin");
+const { getTeamsScore, getTeamsAnswer, getReportedQuestion, getParticipants, uploadAnswer, registerController } = require("../controllers/admin");
 
 // GET API for admin to get score
 // BODY: username, teamname
@@ -16,5 +16,9 @@ router.get("/answer", getTeamsAnswer);
 router.get("/participants", getParticipants);
 
 router.get("/report-question", getReportedQuestion);
+
+//FOR DEV ONLY
+router.post("/upload-answer", uploadAnswer)
+router.post("/create-user", registerController)
 
 module.exports = router;
