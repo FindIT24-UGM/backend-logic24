@@ -13,11 +13,6 @@ exports.ensureAdmin = async (req, res, next) => {
 
 exports.getTeamsScore = async (req, res) => {
   const username = req.body.username;
-  const teamName = req.body.teamName;
-  User.findOneAndUpdate(
-    { username: username },
-    { $set: { teamName: teamName } }
-  );
   try {
     const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
     let questionValue = [];
