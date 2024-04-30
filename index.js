@@ -86,15 +86,15 @@ io.on("connection", (socket) => {
       { teamName: teamName },
       { $set: { [`players.${playerIndex}.socketId`]: socket.id } }
     );
-    const user = await User.findMany({ teamName: teamName });
+    const user = await User.findOne({ teamName: teamName });
     // if (user) {
 
     // }
     if (!user?.endTime) {
       const endTime = new Date();
-      endTime.setHours(endTime.getHours() + 1);
-      // endTime.setMinutes(endTime.getMinutes() + 30);
-      // endTime.setSeconds(endTime.getSeconds() + 20);
+      endTime.setHours(20);
+      endTime.setMinutes(0);
+      endTime.setSeconds(0);
       await User.updateMany(
         {
           teamName: teamName,
