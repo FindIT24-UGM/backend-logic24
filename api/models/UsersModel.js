@@ -30,9 +30,11 @@ const UserSchema = new mongoose.Schema(
     },
     teamName: {
       type: String,
+      default: ""
     },
     playerIndex: {
-      type: String
+      type: String,
+      default: "1"
     },
     players: [
       {

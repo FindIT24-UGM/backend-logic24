@@ -82,11 +82,11 @@ io.on("connection", (socket) => {
     const teamName = authData.teamName;
     const playerIndex = authData.playerIndex;
     const playerName = authData.username;
-    await User.updateOne(
+    await User.updateMany(
       { teamName: teamName },
       { $set: { [`players.${playerIndex}.socketId`]: socket.id } }
     );
-    const user = await User.findOne({ teamName: teamName });
+    const user = await User.findMany({ teamName: teamName });
     // if (user) {
 
     // }
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
       endTime.setHours(endTime.getHours() + 1);
       // endTime.setMinutes(endTime.getMinutes() + 30);
       // endTime.setSeconds(endTime.getSeconds() + 20);
-      await User.updateOne(
+      await User.updateMany(
         {
           teamName: teamName,
         },
@@ -113,7 +113,7 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", async () => {
     console.log("user disconnected");
-    await User.updateOne(
+    await User.updateMany(
       { teamName: teamName_g },
       { $set: { [`players.${playerIndex_g}.socketId`]: null } }
     );
