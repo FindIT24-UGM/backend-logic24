@@ -12,13 +12,13 @@ exports.ensureAdmin = async (req, res, next) => {
 };
 
 exports.getTeamsScore = async (req, res) => {
-  const username = req.body.username;
+  const teamName = req.body.teamName;
   try {
     const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
     let questionValue = [];
     let answerValue = [];
 
-    const examUser = await User.findOne({ username: username });
+    const examUser = await User.findOne({ teamName: teamName });
     let questionTeam = [];
     let answerTeam = [];
 
@@ -130,7 +130,7 @@ exports.getParticipants = (req, res) => {
     const isNotDoing = await countTotalStatus("NO")
     const isDoing = await countTotalStatus("DOING")
     res.status(200).json({
-      user,
+      user: [...new Set(user.map(u => u.teamName))],
       finished,
       isNotDoing,
       isDoing
@@ -193,10 +193,34 @@ exports.registerController = (req, res) => {
   })
 }
 
+exports.getEndTime = (req, res) => {
+  const { teamName } = req.body;
+  User.findOne({ teamName })
+  .exec()
+  .then(async(user) => {
+    if (!user) {
+      return res.status(400).json({
+        errors: "Team with that teamName does not exist",
+      });
+    }
+    return res.json({
+      team: user.teamName,
+      endTime: user.endTime
+    })
+  })
+  .catch(err =>{
+    res.status(404).json(err)
+  })
+}
+
 const countTotalIsFinished = async () => {
-  return await User.countDocuments({ isFinished: true });
+  const users = await User.find({ isFinished: true }).select('teamName');
+  const uniqueTeamNames = new Set(users.map(user => user.teamName));
+  return uniqueTeamNames.size;
 };
 
 const countTotalStatus = async (status) => {
-  return await User.countDocuments({ status });
+  const users = await User.find({ status }).select('teamName');
+  const uniqueTeamNames = new Set(users.map(user => user.teamName));
+  return uniqueTeamNames.size;
 };
