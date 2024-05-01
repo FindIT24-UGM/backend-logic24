@@ -6,7 +6,7 @@ const { getTeamsScore, getTeamsAnswer, getReportedQuestion, getParticipants, upl
 // GET API for admin to get score
 // BODY: username, teamname
 // RETURN: teamname, score
-router.get("/score", getTeamsScore);
+router.post("/score", getTeamsScore);
 
 // GET API for admin to get answers of all users
 // BODY: -
@@ -17,7 +17,7 @@ router.get("/participants", getParticipants);
 
 router.get("/report-question", getReportedQuestion);
 
-router.get("/endtime", getEndTime);
+router.post("/endtime", getEndTime);
 
 //FOR DEV ONLY
 router.post("/upload-answer", uploadAnswer)

@@ -124,13 +124,29 @@ exports.getTeamsAnswer = async (req, res) => {
 };
 
 exports.getParticipants = (req, res) => {
-  User.find().exec()
+  User.aggregate([
+    { 
+      $match: { 
+        teamName: { $exists: true, $ne: null } 
+      } 
+    },
+    { 
+      $group: { 
+        _id: "$teamName",
+        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
+      } 
+    },
+    {
+      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
+    }
+  ]).exec()
   .then(async(user) => {
     const finished = await countTotalIsFinished()
     const isNotDoing = await countTotalStatus("NO")
     const isDoing = await countTotalStatus("DOING")
     res.status(200).json({
-      user: [...new Set(user.map(u => u.teamName))],
+      // user: [...new Set(user.map(u => u.teamName))],
+      user,
       finished,
       isNotDoing,
       isDoing
@@ -214,13 +230,53 @@ exports.getEndTime = (req, res) => {
 }
 
 const countTotalIsFinished = async () => {
-  const users = await User.find({ isFinished: true }).select('teamName');
-  const uniqueTeamNames = new Set(users.map(user => user.teamName));
-  return uniqueTeamNames.size;
+  // return await User.countDocuments({ isFinished: true });
+  // const users = await User.find({ isFinished: true }).select('teamName');
+  // const uniqueTeamNames = new Set(users.map(user => user.teamName));
+  // return uniqueTeamNames.size;
+  const isFinished = await User.aggregate([
+    { 
+      $match: { 
+        teamName: { $exists: true, $ne: null }, 
+        isFinished: true
+      } 
+    },
+    { 
+      $group: { 
+        _id: "$teamName",
+        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
+      } 
+    },
+    {
+      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
+    }
+  ])
+
+  return isFinished.length
 };
 
 const countTotalStatus = async (status) => {
-  const users = await User.find({ status }).select('teamName');
-  const uniqueTeamNames = new Set(users.map(user => user.teamName));
-  return uniqueTeamNames.size;
+  // return await User.countDocuments({ status });
+  // const users = await User.find({ status }).select('teamName');
+  // const uniqueTeamNames = new Set(users.map(user => user.teamName));
+  // return uniqueTeamNames.size;
+  const total = await User.aggregate([
+    { 
+      $match: { 
+        teamName: { $exists: true, $ne: null }, 
+        status: status
+      } 
+    },
+    { 
+      $group: { 
+        _id: "$teamName",
+        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
+      } 
+    },
+    {
+      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
+    }
+  ])
+
+  return total.length
 };
