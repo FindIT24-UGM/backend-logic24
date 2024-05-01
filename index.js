@@ -87,21 +87,36 @@ io.on("connection", (socket) => {
       { $set: { [`players.${playerIndex}.socketId`]: socket.id } }
     );
     const user = await User.findOne({ teamName: teamName });
-    // if (user) {
-
-    // }
-    if (!user?.endTime) {
-      const endTime = new Date();
-      endTime.setHours(20);
-      endTime.setMinutes(0);
-      endTime.setSeconds(0);
+    const localDate = new Date();
+    if (!user?.startedTime) {
+      const startedTime = localDate;
       await User.updateMany(
         {
           teamName: teamName,
         },
         {
           $set: {
-            endTime: endTime,
+            startedTime: startedTime
+          },
+        }
+      );
+    }
+    if (!user?.endTime) {
+      const endTime = localDate;
+      if (localDate.getHours() < 19) {
+        endTime.setHours(endTime.getHours() + 1);
+      } else {
+        endTime.setHours(20);
+        endTime.setMinutes(0);
+        endTime.setSeconds(0);
+      }
+      await User.updateMany(
+        {
+          teamName: teamName,
+        },
+        {
+          $set: {
+            endTime: endTime
           },
         }
       );
