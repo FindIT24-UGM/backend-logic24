@@ -25,8 +25,9 @@ exports.startExamControllers = async (req, res) => {
       } else {
         questionNumber = generateKeys(5);
         essayNumber = generateKeys(5);
-        User.updateOne(
-          { username: examUser },
+        const userTeam = user.teamName;
+        User.updateMany(
+          { teamName: userTeam },
           {
             $set: {
               questionNumber: questionNumber,
@@ -123,22 +124,28 @@ exports.saveUserAnswer = async (req, res) => {
   try {
     const username = req.body.username;
     const answerBody = req.body.answerBody;
-    const updatedUser = await User.findOneAndUpdate(
-      { username: username },
-      { $set: { userAnswer: answerBody } },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(400).json({
-        message: "User is not found!",
-      });
-    }
-
-    res.status(200).json({
-      message: "Answer saved!",
-      data: updatedUser,
-    });
+    await User.findOne({ username: username })
+      .exec()
+      .then( async (user) => {
+        if (!user) {
+          return res.status(400).json({
+            message: "User is not found!",
+          });
+        }
+        const teamName = user.teamName;
+        await User.updateMany(
+          { teamName: teamName },
+          { $set: { userAnswer: answerBody } },
+          { new: true }
+        );
+        res.status(200).json({
+          message: "Answer saved!",
+          data: {
+            teamName: teamName,
+            userAnswer: answerBody
+          },
+        });
+      })
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -177,8 +184,8 @@ exports.getExamEndTime = async (req, res) => {
     const startTime = new Date();
 
     // berapa lama batas waktu pengerjaan, contohnya 1 jam 30 menit
-    const hourDuration = 1;
-    const minuteDuration = 30;
+    const hourDuration = 2;
+    const minuteDuration = 0;
 
     const endTime = new Date(startTime);
     endTime.setHours(startTime.getHours() + hourDuration);

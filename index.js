@@ -103,10 +103,10 @@ io.on("connection", (socket) => {
     }
     if (!user?.endTime) {
       const endTime = localDate;
-      if (localDate.getHours() < 19) {
-        endTime.setHours(endTime.getHours() + 1);
+      if (localDate.getHours() < 14) {
+        endTime.setHours(endTime.getHours() + 2);
       } else {
-        endTime.setHours(20);
+        endTime.setHours(16);
         endTime.setMinutes(0);
         endTime.setSeconds(0);
       }
