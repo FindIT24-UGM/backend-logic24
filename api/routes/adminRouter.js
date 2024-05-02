@@ -15,9 +15,9 @@ const {
 // GET API for admin to get score
 // BODY: username, teamname
 // RETURN: teamname, score
-router.get("/score", getTeamsScore);
+router.post("/score", getTeamsScore);
 
-router.get("/essayanswer", getTeamsEssayAnswer);
+router.post("/essayanswer", getTeamsEssayAnswer);
 
 // GET API for admin to get answers of all users
 // BODY: -

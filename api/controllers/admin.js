@@ -28,8 +28,10 @@ exports.getTeamsScore = async (req, res) => {
     });
 
     examUser.userAnswer.forEach((userAnswer) => {
-      questionTeam.push(userAnswer.quest);
-      answerTeam.push(userAnswer.answer);
+      if(userAnswer.type === "question"){
+        questionTeam.push(userAnswer.quest);
+        answerTeam.push(userAnswer.answer);
+      }
     });
     // for (const [key, value] of Object.entries(targetAnswer.answeredPairs)) {
     //   questionValue.push(key);
@@ -40,28 +42,29 @@ exports.getTeamsScore = async (req, res) => {
     //   questionTeam.push(key);
     //   answerTeam.push(value);
     // }
-
+    // console.log(examUser.userAnswer);
     if (examUser) {
       let score = 0;
       let benar = 0;
       let salah = 0;
-
-      for (let i = 0; i < questionTeam.length; i++) {
+      //LOGIC SCORING DAH FIX, KLO MAU GANTI JGN GANTI DI SINI 
+      for (let i = 0; i <= questionTeam.length; i++) {
         let question = questionTeam[i];
         let answer = answerTeam[i];
         // let questionIndex = questionValue.indexOf(question);
-        for (let j = 0; j < questionValue.length; j++) {
+        for (let j = 0; j <= questionValue.length; j++) {
           let questionKey = questionValue[j];
           let answerKey = answerValue[j];
-
+          
           if (question == questionKey && answer == answerKey) {
-            score += 4;
-            benar += 1;
-          }
-          if (question == questionKey && answer != answerKey) {
-            score += -1;
-            salah += 1;
-          }
+              console.log(answer);
+              score += 4; 
+              benar += 1;
+            }
+            if (question == questionKey && answer != answerKey) {
+              score += -1;
+              salah += 1;
+            }
         }
         // if (questionIndex !== -1) {
         //   let answerValueAtIndex = answerValue[questionIndex];
@@ -101,51 +104,32 @@ exports.getTeamsScore = async (req, res) => {
 exports.getTeamsEssayAnswer = async (req, res) => {
   const teamName = req.body.teamName;
   try {
-    const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
-    let questionValue = [];
-    let answerValue = [];
+    // const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
+    // let questionValue = [];
+    // let answerValue = [];
 
     const examUser = await User.findOne({ teamName: teamName });
     let questionTeam = [];
     let answerTeam = [];
 
-    targetAnswer.answeredPairs.forEach((answer) => {
-      questionValue.push(answer.essay);
-      answerValue.push(answer.answer);
-    });
+    // targetAnswer.answeredPairs.forEach((answer) => {
+    //   questionValue.push(answer.essay);
+    //   answerValue.push(answer.answer);
+    // });
 
     examUser.userAnswer.forEach((userAnswer) => {
+      if(userAnswer.type === "essay"){
       questionTeam.push(userAnswer.essay);
       answerTeam.push(userAnswer.answer);
+      }
     });
 
-    if (examUser) {
-      for (let i = 0; i < questionTeam.length; i++) {
-        let question = questionTeam[i];
-        let answer = answerTeam[i];
-        // let questionIndex = questionValue.indexOf(question);
-        for (let j = 0; j < questionValue.length; j++) {
-          let questionKey = questionValue[j];
-          let answerKey = answerValue[j];
-        }
-        // if (questionIndex !== -1) {
-        //   let answerValueAtIndex = answerValue[questionIndex];
-
-        //   if ((answer = answerValueAtIndex)) {
-        //     score += 4;
-        //     benar += 1;
-        //   } else if ((answer = answerValueAtIndex)) {
-        //     score -= 1;
-        //     salah += 1;
-        //   }
-        // }
-        return res.status(200).json({
-          message: "Team answer successfully fetched!",
-          teamName: examUser.teamName,
-          essayanswer: examUser.userAnswer,
-        });
-      }
-    }
+    return res.status(200).json({
+      message: "Team answer successfully fetched!",
+      teamName: examUser.teamName,
+      essayanswer: examUser.userAnswer,
+    });
+    
   } catch (error) {
     return res.status(400).json({
       message: "Failed to get essay answer",
