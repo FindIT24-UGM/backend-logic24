@@ -9,6 +9,7 @@ const {
   getEssay,
   getUserAnswer,
   reportQuestion,
+  getExamEndTime
 } = require("../controllers/exam");
 const {
   ensureOpen,
@@ -61,5 +62,7 @@ router.patch("/finish", ensureOpen, signInRequired, finishedExam);
 // BODY: username
 // RETURN: result
 router.patch("/result", ensureOpen , signInRequired, getUserAnswer);
+
+router.get("/endtime", getExamEndTime);
 
 module.exports = router;
