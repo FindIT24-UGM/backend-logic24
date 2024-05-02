@@ -109,7 +109,7 @@ exports.authenticateSocket = async (req, res) => {
   console.log(user.endTime)
   if(!user.endTime) {
     const endTime = new Date();
-    endTime.setHours(endTime.getHours() + 1);
+    endTime.setHours(endTime.getHours() + 2);
     const updateQuery = {
       $set: {
         endTime: endTime

@@ -10,21 +10,8 @@ exports.startExamControllers = async (req, res) => {
     .exec()
     .then((user) => {
       let questionNumber;
-      if (
-        user &&
-        user.questionNumber.length > 1 &&
-        user.essayNumber.length > 1
-      ) {
-        questionNumber = user.questionNumber;
-        essayNumber = user.essayNumber;
-        res.status(200).json({
-          message: "Question successfully retrieved!",
-          questionNumber: questionNumber,
-          essayNumber: essayNumber,
-        });
-      } else {
-        questionNumber = generateKeys(5);
-        essayNumber = generateKeys(5);
+        questionNumber = generateKeys(45);
+        essayNumber = generateKeys(10);
         const userTeam = user.teamName;
         User.updateMany(
           { teamName: userTeam },
@@ -51,7 +38,6 @@ exports.startExamControllers = async (req, res) => {
               err: err,
             });
           });
-      }
     })
     .catch((err) => {
       res.status(500).json({
@@ -180,20 +166,20 @@ exports.getExamEndTime = async (req, res) => {
     // kita perlu attribute userStartExamTime, aku sembarang dulu ya
     const user = await User.findOne({ username: username });
 
-    // sembarang userStartExamTime
-    const startTime = new Date();
+    // // sembarang userStartExamTime
+    // const startTime = new Date();
 
-    // berapa lama batas waktu pengerjaan, contohnya 1 jam 30 menit
-    const hourDuration = 2;
-    const minuteDuration = 0;
+    // // berapa lama batas waktu pengerjaan, contohnya 1 jam 30 menit
+    // const hourDuration = 2;
+    // const minuteDuration = 0;
 
-    const endTime = new Date(startTime);
-    endTime.setHours(startTime.getHours() + hourDuration);
-    endTime.setMinutes(startTime.getMinutes() + minuteDuration);
+    // const endTime = new Date(startTime);
+    // endTime.setHours(startTime.getHours() + hourDuration);
+    // endTime.setMinutes(startTime.getMinutes() + minuteDuration);
 
     res.status(200).json({
       message: "Exam end time retrieved",
-      data: endTime,
+      data: user.endTime,
     });
   } catch (err) {
     res.status(500).json({
