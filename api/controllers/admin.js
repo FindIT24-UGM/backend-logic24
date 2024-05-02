@@ -1,6 +1,6 @@
 const QuestionModel = require("../models/QuestionModel");
 const User = require("../models/UsersModel");
-const Answer = require("../models/AnswerModel")
+const Answer = require("../models/AnswerModel");
 
 exports.ensureAdmin = async (req, res, next) => {
   if (req.body.role !== "mbaksk" || "b4ngIC") {
@@ -22,15 +22,15 @@ exports.getTeamsScore = async (req, res) => {
     let questionTeam = [];
     let answerTeam = [];
 
-    targetAnswer.answeredPairs.forEach(answer => {
+    targetAnswer.answeredPairs.forEach((answer) => {
       questionValue.push(answer.question);
       answerValue.push(answer.answer);
     });
 
-    examUser.userAnswer.forEach(userAnswer => {
-      questionTeam.push(userAnswer.quest)
-      answerTeam.push(userAnswer.answer)
-    })
+    examUser.userAnswer.forEach((userAnswer) => {
+      questionTeam.push(userAnswer.quest);
+      answerTeam.push(userAnswer.answer);
+    });
     // for (const [key, value] of Object.entries(targetAnswer.answeredPairs)) {
     //   questionValue.push(key);
     //   answerValue.push(value);
@@ -50,19 +50,18 @@ exports.getTeamsScore = async (req, res) => {
         let question = questionTeam[i];
         let answer = answerTeam[i];
         // let questionIndex = questionValue.indexOf(question);
-        for (let j = 0; j < questionValue.length; j++){
+        for (let j = 0; j < questionValue.length; j++) {
           let questionKey = questionValue[j];
           let answerKey = answerValue[j];
 
-          if(question == questionKey && answer == answerKey){
+          if (question == questionKey && answer == answerKey) {
             score += 4;
             benar += 1;
           }
-          if(question == questionKey && answer != answerKey){
+          if (question == questionKey && answer != answerKey) {
             score += -1;
             salah += 1;
           }
-          
         }
         // if (questionIndex !== -1) {
         //   let answerValueAtIndex = answerValue[questionIndex];
@@ -81,7 +80,8 @@ exports.getTeamsScore = async (req, res) => {
         teamName: examUser.teamName,
         score: score,
         benar,
-        salah
+        salah,
+        // answer: answerValue,
         // kunci: targetAnswer.answeredPairs,
         // user: examUser.userAnswer
       });
@@ -94,6 +94,61 @@ exports.getTeamsScore = async (req, res) => {
     res.status(500).json({
       message: "Failed to get the team score!",
       err: err.message,
+    });
+  }
+};
+
+exports.getTeamsEssayAnswer = async (req, res) => {
+  const teamName = req.body.teamName;
+  try {
+    const targetAnswer = await Answer.findOne({ name: "AnswerMultiple" });
+    let questionValue = [];
+    let answerValue = [];
+
+    const examUser = await User.findOne({ teamName: teamName });
+    let questionTeam = [];
+    let answerTeam = [];
+
+    targetAnswer.answeredPairs.forEach((answer) => {
+      questionValue.push(answer.essay);
+      answerValue.push(answer.answer);
+    });
+
+    examUser.userAnswer.forEach((userAnswer) => {
+      questionTeam.push(userAnswer.essay);
+      answerTeam.push(userAnswer.answer);
+    });
+
+    if (examUser) {
+      for (let i = 0; i < questionTeam.length; i++) {
+        let question = questionTeam[i];
+        let answer = answerTeam[i];
+        // let questionIndex = questionValue.indexOf(question);
+        for (let j = 0; j < questionValue.length; j++) {
+          let questionKey = questionValue[j];
+          let answerKey = answerValue[j];
+        }
+        // if (questionIndex !== -1) {
+        //   let answerValueAtIndex = answerValue[questionIndex];
+
+        //   if ((answer = answerValueAtIndex)) {
+        //     score += 4;
+        //     benar += 1;
+        //   } else if ((answer = answerValueAtIndex)) {
+        //     score -= 1;
+        //     salah += 1;
+        //   }
+        // }
+        return res.status(200).json({
+          message: "Team answer successfully fetched!",
+          teamName: examUser.teamName,
+          essayanswer: examUser.userAnswer,
+        });
+      }
+    }
+  } catch (error) {
+    return res.status(400).json({
+      message: "Failed to get essay answer",
     });
   }
 };
@@ -125,109 +180,112 @@ exports.getTeamsAnswer = async (req, res) => {
 
 exports.getParticipants = (req, res) => {
   User.aggregate([
-    { 
-      $match: { 
-        teamName: { $exists: true, $ne: null } 
-      } 
-    },
-    { 
-      $group: { 
-        _id: "$teamName",
-        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
-      } 
+    {
+      $match: {
+        teamName: { $exists: true, $ne: null },
+      },
     },
     {
-      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
-    }
-  ]).exec()
-  .then(async(user) => {
-    const finished = await countTotalIsFinished()
-    const isNotDoing = await countTotalStatus("NO")
-    const isDoing = await countTotalStatus("DOING")
-    res.status(200).json({
-      // user: [...new Set(user.map(u => u.teamName))],
-      user,
-      finished,
-      isNotDoing,
-      isDoing
+      $group: {
+        _id: "$teamName",
+        user: { $first: "$$ROOT" }, // Mengambil satu dokumen dari setiap grup
+      },
+    },
+    {
+      $replaceRoot: { newRoot: "$user" }, // Mengganti root dokumen dengan dokumen dari setiap grup
+    },
+  ])
+    .exec()
+    .then(async (user) => {
+      const finished = await countTotalIsFinished();
+      const isNotDoing = await countTotalStatus("NO");
+      const isDoing = await countTotalStatus("DOING");
+      res.status(200).json({
+        // user: [...new Set(user.map(u => u.teamName))],
+        user,
+        finished,
+        isNotDoing,
+        isDoing,
+      });
     })
-  })
-  .catch(err =>{
-    res.status(404).json(err)
-  })
-}
+    .catch((err) => {
+      res.status(404).json(err);
+    });
+};
 
 exports.getReportedQuestion = (req, res) => {
   QuestionModel.find({
-    report: { $not: { $size: 0 } }
+    report: { $not: { $size: 0 } },
   })
-  .exec()
-  .then(result => {
-    res.status(200).json({
-      info: "Reported Question",
-      reportedQuestion: result
+    .exec()
+    .then((result) => {
+      res.status(200).json({
+        info: "Reported Question",
+        reportedQuestion: result,
+      });
     })
-  })
-  .catch(err => {
-    res.status(404).json({
-      error: "cannot get reported question", 
-      err
-    })
-  })
-}
+    .catch((err) => {
+      res.status(404).json({
+        error: "cannot get reported question",
+        err,
+      });
+    });
+};
 
 exports.uploadAnswer = (req, res) => {
-  const { answeredPairs } = req.body
+  const { answeredPairs } = req.body;
   const newAnswer = new Answer({
     name: "AnswerMultiple",
-    answeredPairs
-  })
+    answeredPairs,
+  });
   newAnswer
-  .save()
-  .then(result => {
-    res.status(201).json(result)
-  }).catch(err => {
-    res.status(404).json(err)
-  })
-}
+    .save()
+    .then((result) => {
+      res.status(201).json(result);
+    })
+    .catch((err) => {
+      res.status(404).json(err);
+    });
+};
 
 exports.registerController = (req, res) => {
-  const { username, password } = req.body
+  const { username, password } = req.body;
   const newUser = new User({
     username,
-    password
-  })
-  newUser.save()
-  .then(result => {
-    res.status(201).json({
-      message: "success create new user",
-      result
+    password,
+  });
+  newUser
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        message: "success create new user",
+        result,
+      });
     })
-  })
-  .catch(err => {
-    res.status(404).json(err)
-  })
-}
+    .catch((err) => {
+      res.status(404).json(err);
+    });
+};
 
 exports.getEndTime = (req, res) => {
   const { teamName } = req.body;
   User.findOne({ teamName })
-  .exec()
-  .then(async(user) => {
-    if (!user) {
-      return res.status(400).json({
-        errors: "Team with that teamName does not exist",
+    .exec()
+    .then(async (user) => {
+      if (!user) {
+        return res.status(400).json({
+          errors: "Team with that teamName does not exist",
+        });
+      }
+      return res.json({
+        team: user.teamName,
+        endTime: user.endTime,
       });
-    }
-    return res.json({
-      team: user.teamName,
-      endTime: user.endTime
     })
-  })
-  .catch(err =>{
-    res.status(404).json(err)
-  })
-}
+    .catch((err) => {
+      res.status(404).json(err);
+    });
+};
 
 const countTotalIsFinished = async () => {
   // return await User.countDocuments({ isFinished: true });
@@ -235,24 +293,24 @@ const countTotalIsFinished = async () => {
   // const uniqueTeamNames = new Set(users.map(user => user.teamName));
   // return uniqueTeamNames.size;
   const isFinished = await User.aggregate([
-    { 
-      $match: { 
-        teamName: { $exists: true, $ne: null }, 
-        isFinished: true
-      } 
-    },
-    { 
-      $group: { 
-        _id: "$teamName",
-        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
-      } 
+    {
+      $match: {
+        teamName: { $exists: true, $ne: null },
+        isFinished: true,
+      },
     },
     {
-      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
-    }
-  ])
+      $group: {
+        _id: "$teamName",
+        user: { $first: "$$ROOT" }, // Mengambil satu dokumen dari setiap grup
+      },
+    },
+    {
+      $replaceRoot: { newRoot: "$user" }, // Mengganti root dokumen dengan dokumen dari setiap grup
+    },
+  ]);
 
-  return isFinished.length
+  return isFinished.length;
 };
 
 const countTotalStatus = async (status) => {
@@ -261,22 +319,22 @@ const countTotalStatus = async (status) => {
   // const uniqueTeamNames = new Set(users.map(user => user.teamName));
   // return uniqueTeamNames.size;
   const total = await User.aggregate([
-    { 
-      $match: { 
-        teamName: { $exists: true, $ne: null }, 
-        status: status
-      } 
-    },
-    { 
-      $group: { 
-        _id: "$teamName",
-        user: { $first: "$$ROOT" } // Mengambil satu dokumen dari setiap grup
-      } 
+    {
+      $match: {
+        teamName: { $exists: true, $ne: null },
+        status: status,
+      },
     },
     {
-      $replaceRoot: { newRoot: "$user" } // Mengganti root dokumen dengan dokumen dari setiap grup
-    }
-  ])
+      $group: {
+        _id: "$teamName",
+        user: { $first: "$$ROOT" }, // Mengambil satu dokumen dari setiap grup
+      },
+    },
+    {
+      $replaceRoot: { newRoot: "$user" }, // Mengganti root dokumen dengan dokumen dari setiap grup
+    },
+  ]);
 
-  return total.length
+  return total.length;
 };
