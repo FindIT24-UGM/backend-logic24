@@ -16,9 +16,9 @@
     <script type="module">
       const socket = io();
       let authData = {
-        teamName: "dev",
-        playerIndex: "2",
-        username: "tester"
+        teamName: "tester",
+        playerIndex: "1",
+        username: "Tester sedang mengerjakan"
       }
       socket.emit("player-auth", authData);
       socket.on("teammate-join", (teammatejoin) => {
