@@ -104,10 +104,11 @@ io.on("connection", (socket) => {
     if (!user?.endTime) {
       const endTime = localDate;
       if (localDate.getHours() < 14) {
-        endTime.setHours(endTime.getHours() + 2);
+        endTime.setHours(endTime.getHours() + 1);
+        endTime.setHours(endTime.getMinutes() + 30);
       } else {
-        endTime.setHours(16);
-        endTime.setMinutes(0);
+        endTime.setHours(15);
+        endTime.setMinutes(30);
         endTime.setSeconds(0);
       }
       await User.updateMany(
