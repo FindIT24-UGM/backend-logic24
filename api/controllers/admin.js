@@ -331,3 +331,12 @@ exports.unfinished = async (req, res) => {
     return res.status(500).json({ error: "Terjadi kesalahan saat memperbarui data." });
   }
 };
+
+exports.resetEndTime = async (req, res) => {
+  try {
+    await User.updateMany({}, { $set: { endTime: null } });
+    return res.json({ message: "Perubahan berhasil!" });
+  } catch (error) {
+    return res.status(500).json({ error: "Terjadi kesalahan saat memperbarui data." });
+  }
+};
