@@ -325,7 +325,7 @@ const countTotalStatus = async (status) => {
 
 exports.unfinished = async (req, res) => {
   try {
-    await User.updateMany({}, { $set: { isFinished: false } });
+    await User.updateMany({}, { $set: { isFinished: false, status: "NO" } });
     return res.json({ message: "Perubahan berhasil!" });
   } catch (error) {
     return res.status(500).json({ error: "Terjadi kesalahan saat memperbarui data." });

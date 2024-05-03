@@ -9,9 +9,17 @@ exports.startExamControllers = async (req, res) => {
   User.findOne({ username: examUser })
     .exec()
     .then((user) => {
-      let questionNumber;
-        questionNumber = generateKeys(45);
-        essayNumber = generateKeys(10);
+      // let questionNumber;
+      let questionNumber = []
+      for(let i = 1; i <= 45; i++){
+        questionNumber.push(i)
+      }
+      let essayNumber = []
+      for(let i = 1; i <= 10; i++){
+        essayNumber.push(i)
+      }
+        // questionNumber = generateKeys(45);
+        // essayNumber = generateKeys(10);
         const userTeam = user.teamName;
         User.updateMany(
           { teamName: userTeam },
