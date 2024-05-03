@@ -322,3 +322,12 @@ const countTotalStatus = async (status) => {
 
   return total.length;
 };
+
+exports.unfinished = async (req, res) => {
+  try {
+    await User.updateMany({}, { $set: { isFinished: false } });
+    return res.json({ message: "Perubahan berhasil!" });
+  } catch (error) {
+    return res.status(500).json({ error: "Terjadi kesalahan saat memperbarui data." });
+  }
+};
