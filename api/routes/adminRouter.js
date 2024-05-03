@@ -10,7 +10,8 @@ const {
   registerController,
   getTeamsEssayAnswer,
   getEndTime,
-  unfinished
+  unfinished,
+  resetEndTime
 } = require("../controllers/admin");
 
 // GET API for admin to get score
@@ -35,5 +36,7 @@ router.post("/endtime", getEndTime);
 router.post("/upload-answer", uploadAnswer);
 router.post("/create-user", registerController);
 router.post("/unfinished", unfinished);
+router.post("/resetEndTime", resetEndTime);
+
 
 module.exports = router;
