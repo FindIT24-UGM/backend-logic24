@@ -11,7 +11,8 @@ const {
   getTeamsEssayAnswer,
   getEndTime,
   unfinished,
-  resetEndTime
+  resetEndTime,
+  resetUserAnswer
 } = require("../controllers/admin");
 
 // GET API for admin to get score
@@ -35,6 +36,7 @@ router.post("/endtime", getEndTime);
 //FOR DEV ONLY
 router.post("/upload-answer", uploadAnswer);
 router.post("/create-user", registerController);
+router.post("/reset-answer", resetUserAnswer);
 router.post("/unfinished", unfinished);
 router.post("/resetEndTime", resetEndTime);
 

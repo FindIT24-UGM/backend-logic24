@@ -323,6 +323,18 @@ const countTotalStatus = async (status) => {
   return total.length;
 };
 
+
+//DI BAWAH INI FOR DEV ONLY
+exports.resetUserAnswer = (req, res) => {
+  User.updateMany({teamName: req.body.teamName}, { $set: { userAnswer: [] } })
+    .then(result => {
+      res.status(201).json({ message: "berhasil reset user answer"})
+    })
+    .catch(err => {
+      res.status(404).json(err)
+    })
+}
+
 exports.unfinished = async (req, res) => {
   try {
     await User.updateMany({}, { $set: { isFinished: false, status: "NO" } });
