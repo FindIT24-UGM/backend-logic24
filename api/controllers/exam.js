@@ -11,11 +11,11 @@ exports.startExamControllers = async (req, res) => {
     .then((user) => {
       // let questionNumber;
       let questionNumber = []
-      for(let i = 1; i <= 45; i++){
+      for(let i = 1; i <= 15; i++){
         questionNumber.push(i)
       }
       let essayNumber = []
-      for(let i = 1; i <= 10; i++){
+      for(let i = 1; i <= 20; i++){
         essayNumber.push(i)
       }
         // questionNumber = generateKeys(45);

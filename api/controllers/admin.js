@@ -326,7 +326,7 @@ const countTotalStatus = async (status) => {
 
 //DI BAWAH INI FOR DEV ONLY
 exports.resetUserAnswer = (req, res) => {
-  User.updateMany({teamName: req.body.teamName}, { $set: { userAnswer: [] } })
+  User.updateMany({}, { $set: { userAnswer: [] } })
     .then(result => {
       res.status(201).json({ message: "berhasil reset user answer"})
     })
@@ -337,7 +337,7 @@ exports.resetUserAnswer = (req, res) => {
 
 exports.unfinished = async (req, res) => {
   try {
-    await User.updateMany({}, { $set: { isFinished: false, status: "NO" } });
+    await User.updateMany({}, { $set: { isFinished: true, status: "DONE" } });
     return res.json({ message: "Perubahan berhasil!" });
   } catch (error) {
     return res.status(500).json({ error: "Terjadi kesalahan saat memperbarui data." });
